@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+.DS_Store
+.vscode/
+
+data/*.csv
+data/*.parquet
+data/*.xlsx
+
+models/*.joblib
+models/*.pkl

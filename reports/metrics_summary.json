@@ -1,0 +1,170 @@
+{
+  "config": {
+    "data_path": "data/loans_clean.csv",
+    "target_col": "Default",
+    "date_col": null,
+    "parse_date_format": null,
+    "random_state": 42,
+    "test_size": 0.2,
+    "policy_valid_size": 0.2,
+    "calibration_size": 0.2,
+    "ead_col": "LoanAmount",
+    "lgd_col": "lgd",
+    "ead_default": 10000.0,
+    "lgd_default": 0.6,
+    "downturn_lgd_multiplier": 1.0,
+    "apr_col_candidates": [
+      "InterestRate",
+      "interest_rate",
+      "apr",
+      "int_rate",
+      "rate"
+    ],
+    "term_col_candidates": [
+      "LoanTerm",
+      "term_months",
+      "term",
+      "loan_term"
+    ],
+    "funding_rate_annual": 0.04,
+    "orig_fee_rate": 0.02,
+    "ops_cost_per_loan": 50.0,
+    "benefit_default": 300.0,
+    "apr_min": 0.0,
+    "apr_max": 0.6,
+    "term_months_min": 1.0,
+    "term_months_max": 120.0,
+    "exclude_from_pd_features": [
+      "InterestRate",
+      "LoanID"
+    ],
+    "leakage_keyword_patterns": [
+      "(?i)last[_\\s-]*pmt",
+      "(?i)next[_\\s-]*pmt",
+      "(?i)pymnt|payment|paid",
+      "(?i)collection|recover|recovery",
+      "(?i)charge[_\\s-]*off|charged[_\\s-]*off",
+      "(?i)delinq|dpd|days[_\\s-]*past[_\\s-]*due",
+      "(?i)settlement|hardship|bankrupt",
+      "(?i)outstanding[_\\s-]*principal|principal[_\\s-]*outstanding",
+      "(?i)months[_\\s-]*since",
+      "(?i)status|loan[_\\s-]*status"
+    ],
+    "extra_drop_cols": [],
+    "calibration_method": "sigmoid",
+    "decision_objective": "max_profit",
+    "el_cap": 5000000.0,
+    "n_risk_bands": 10,
+    "model_dir": "models",
+    "report_dir": "reports"
+  },
+  "split": {
+    "split_type": "random_stratified",
+    "note": "No date_col provided or found; using stratified random split."
+  },
+  "leakage": {
+    "explicit_exclude": [
+      "InterestRate",
+      "LoanID"
+    ],
+    "keyword_leakage": [
+      "MaritalStatus"
+    ],
+    "user_extra_drop": []
+  },
+  "dropped_columns_all": [
+    "InterestRate",
+    "LoanID",
+    "MaritalStatus"
+  ],
+  "model_selection": {
+    "logreg_val_uncal": {
+      "roc_auc": 0.7156235663863073,
+      "pr_auc": 0.2611853478375168,
+      "brier": 0.21456651657349887,
+      "ks": 0.31344347658138333
+    },
+    "hgb_val_uncal": {
+      "roc_auc": 0.7203652553494804,
+      "pr_auc": 0.2858635075128293,
+      "brier": 0.20567549110400637,
+      "ks": 0.31622295933729877
+    },
+    "chosen_base": "hgb",
+    "selection_metric": "pr_auc_on_policy_validation_uncalibrated"
+  },
+  "calibration": {
+    "method": "sigmoid",
+    "protocol": "base model trained on base_train; calibrator fit on cal_df; eval on test"
+  },
+  "final_test": {
+    "metrics_uncalibrated": {
+      "roc_auc": 0.7297306599089347,
+      "pr_auc": 0.2918666001605721,
+      "brier": 0.2056626700813646,
+      "ks": 0.3416685041315029
+    },
+    "metrics_calibrated": {
+      "roc_auc": 0.7297306599089347,
+      "pr_auc": 0.2918666001605721,
+      "brier": 0.09358245462304639,
+      "ks": 0.3416685041315029
+    }
+  },
+  "policy_threshold": {
+    "tuned_on": "policy_validation_only",
+    "objective": "max_profit",
+    "threshold": 0.34,
+    "validation_portfolio": {
+      "approval_rate": 0.9678627374192285,
+      "expected_loss_total": 344173051.4330168,
+      "expected_profit_total": 987256551.3608366,
+      "objective": "max_profit",
+      "el_cap": null
+    },
+    "validation_ops": {
+      "threshold": 0.34,
+      "tn": 35380.0,
+      "fp": 732.0,
+      "fn": 4163.0,
+      "tp": 581.0,
+      "precision": 0.4424980959634425,
+      "recall": 0.12247048903878584
+    }
+  },
+  "test_policy_outcomes": {
+    "approval_rate": 0.9673389465439592,
+    "expected_loss_total": 432091448.5056335,
+    "expected_profit_total": 1245403620.2390275,
+    "test_ops": {
+      "threshold": 0.34,
+      "tn": 44220.0,
+      "fp": 919.0,
+      "fn": 5182.0,
+      "tp": 749.0,
+      "precision": 0.4490407673860911,
+      "recall": 0.1262856179396392
+    },
+    "test_default_rate": 0.11613471705502251,
+    "avg_predicted_pd_test": 0.11654535103608174,
+    "avg_predicted_pd_approved": 0.106264838682864,
+    "profit_per_approved": 25209.578969252812,
+    "el_per_approved": 8746.436348844854,
+    "lift_table_path": "reports\\lift_table_test.csv"
+  },
+  "economics": {
+    "benefit_meta": {
+      "benefit_source": "apr_term_simple",
+      "apr_col": "InterestRate",
+      "term_col": "LoanTerm"
+    },
+    "funding_rate_annual": 0.04,
+    "orig_fee_rate": 0.02,
+    "ops_cost_per_loan": 50.0,
+    "note": "simplified unit economics for portfolio project"
+  },
+  "monitoring": {
+    "psi_predicted_pd_base_train_vs_test": 0.00022288362473123468,
+    "psi_bins": 10
+  }
+}

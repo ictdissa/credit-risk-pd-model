@@ -1,0 +1,17 @@
+{
+  "drop_cols": [
+    "InterestRate",
+    "LoanID",
+    "MaritalStatus"
+  ],
+  "reasons": {
+    "explicit_exclude": [
+      "InterestRate",
+      "LoanID"
+    ],
+    "keyword_leakage": [
+      "MaritalStatus"
+    ],
+    "user_extra_drop": []
+  }
+}
