@@ -56,14 +56,23 @@ python pd_model.py --data_path data/loans_clean.csv --target_col Default --date_
 After training, you can load the saved model and output PD scores:
 
 ```python
+import json
 import joblib
 import pandas as pd
 
 model = joblib.load("models/pd_model_calibrated.joblib")
 
+# Load leakage/feature drop list produced during training
+with open("reports/LEAKAGE_DROPS.json", "r", encoding="utf-8") as f:
+    drop_cols = json.load(f)["drop_cols"]
+
 df_new = pd.read_csv("data/new_applicants.csv")
-pd_scores = model.predict_proba(df_new)[:, 1]  # PD for each applicant
-df_new["PD"] = pd_scores
+
+# Drop columns the model was trained to exclude
+X_new = df_new.drop(columns=drop_cols, errors="ignore")
+
+# Predict PD per applicant
+df_new["PD"] = model.predict_proba(X_new)[:, 1]
 df_new.to_csv("reports/pd_scores_new_applicants.csv", index=False)
 ```
 
