@@ -50,6 +50,23 @@ python pd_model.py --data_path data/loans_clean.csv --target_col Default --date_
 
 * reports/MONITORING_REPORT.md — monitoring plan + PSI drift
 
+* models/pd_model_calibrated.joblib` — trained calibrated PD model 
+
+## Scoring new applicants (PD output per row)
+After training, you can load the saved model and output PD scores:
+
+```python
+import joblib
+import pandas as pd
+
+model = joblib.load("models/pd_model_calibrated.joblib")
+
+df_new = pd.read_csv("data/new_applicants.csv")
+pd_scores = model.predict_proba(df_new)[:, 1]  # PD for each applicant
+df_new["PD"] = pd_scores
+df_new.to_csv("reports/pd_scores_new_applicants.csv", index=False)
+```
+
 <details>
   <summary><b>How it works (technical)</b></summary>
 
